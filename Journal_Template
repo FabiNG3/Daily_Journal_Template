@@ -1,0 +1,216 @@
+\documentclass[english,a5paper]{article}
+\usepackage[landscape,margin=0.2cm,left=1cm,right=1cm]{geometry}
+\usepackage{translator}
+\usepackage{pgfcalendar-ext}
+\usepackage{tikz} % Required for pgfcalendar
+\usetikzlibrary{calendar,shapes.geometric}
+\usepackage{hyperref}
+\hypersetup{hidelinks}
+\usepackage{lmodern} % For scalable fonts
+\usepackage{bookmark} % Improved bookmarks handling
+\usepackage[utf8]{inputenc} % this is needed for umlauts
+\usepackage[english]{babel} % this is needed for umlauts
+\usepackage[T1]{fontenc}   
+\usepackage{enumitem}
+\usepackage{tabularx}
+\usepackage{textpos}
+\usepackage{xcolor}
+%\usepackage[iso]{isodate} % For ISO date handling
+% Suppress section numbering in the text but keep in bookmarks
+%\renewcommand\thesection{} % Empty section numbering
+%\renewcommand\thesubsection{} % Empty subsection numbering
+\makeatletter
+\renewcommand\@seccntformat[1]{} % Remove numbers from section titles
+\makeatother
+
+\pagestyle{empty}
+\begin{document}
+
+\section{Overview} 
+\label{Overview}
+
+\clearpage
+% Initialize month counter
+\newcounter{month}
+\setcounter{month}{0}
+\newcount\myWeekNumber
+\newcount\CWnumber
+\newbox\DayListBox
+% Loop over each day of 2024
+\pgfcalendar{}{2024-01-01}{2024-02-29}{%
+  % Extract date components
+  \edef\CurrentYear{\pgfcalendarcurrentyear}%
+  \edef\CurrentMonth{\pgfcalendarcurrentmonth}%
+  \edef\CurrentDay{\pgfcalendarcurrentday}%
+
+  \edef\DisplayDate{\CurrentDay.\CurrentMonth.\CurrentYear}%
+  \pgfcalendarjulianyeartoweek{\pgfcalendarcurrentjulian}{\pgfcalendarcurrentyear}{\myWeekNumber}%
+  \edef\WeekdayNumber{\number\numexpr\pgfcalendarcurrentweekday\relax}%
+
+
+
+  
+  % Check for new month
+\ifnum\CurrentMonth>\value{month}
+  \setcounter{month}{\CurrentMonth}
+  \clearpage
+  \phantomsection % Create a target for hyperlinking
+  \edef\MonthLabel{month\CurrentMonth}
+  \hypertarget{\MonthLabel}{}
+  \begin{center}
+  \section{{\Huge\pgfcalendarmonthname{\CurrentMonth}}}    
+  \end{center}
+  \vspace{1cm}
+\begin{center}
+
+\newcount\rowcount
+\rowcount = 1\relax
+ \begin{tikzpicture}[x=2.5cm,y=2cm,font=\Huge]
+
+  \path (-.6,0) node[gray] {\Large CW};
+  \path (0,0) node {\pgfcalendarweekdayshortname{0}};
+  \path (1,0) node {\pgfcalendarweekdayshortname{1}};
+  \path (2,0) node {\pgfcalendarweekdayshortname{2}};
+  \path (3,0) node {\pgfcalendarweekdayshortname{3}};
+  \path (4,0) node {\pgfcalendarweekdayshortname{4}};
+  \path (5,0) node {\pgfcalendarweekdayshortname{5}};
+  \path (6,0) node {\pgfcalendarweekdayshortname{6}};
+  
+  \edef\CWLabel{sumCW\the\CWnumber}%
+  \hypertarget{\CWLabel}{}
+  \pgfcalendar{}{\CurrentYear-\CurrentMonth-01}{\CurrentYear-\CurrentMonth-last}
+  {
+  \pgfcalendarjulianyeartoweek{\pgfcalendarcurrentjulian}{\pgfcalendarcurrentyear}{\CWnumber}%
+\edef\WeekdayNumber{\number\numexpr\pgfcalendarcurrentweekday\relax}%
+    \ifdate{Monday}{\path (-0.6,-\rowcount) node[gray] {\hyperlink{\CWLabel}{\Large\the\CWnumber}};}{}
+    \ifdate{Saturday}{\path (\pgfcalendarcurrentweekday,-\rowcount) node[gray] {\hyperlink{day\pgfcalendarcurrentday.\CurrentMonth.\CurrentYear}{\pgfcalendarcurrentday}};}{
+    \ifdate{Sunday}{\path (\pgfcalendarcurrentweekday,-\rowcount) node[red] {\hyperlink{day\pgfcalendarcurrentday.\CurrentMonth.\CurrentYear}{\pgfcalendarcurrentday}};}{
+    \path (\pgfcalendarcurrentweekday,-\rowcount) node {\hyperlink{day\pgfcalendarcurrentday.\CurrentMonth.\CurrentYear}{\pgfcalendarcurrentday}};}} % Default color for weekdays
+    
+   \ifdate{Sunday}{\advance\rowcount by 1}{}
+   \draw[line width=0.15mm, gray] (-0.35,0.25) -- (-0.35,-\rowcount-0.25);
+  }% end of loop
+  
+ \end{tikzpicture}%
+\end{center}
+\fi
+%
+  % Start a new page for each day
+  \clearpage
+  \phantomsection % Create a target for hyperlinking
+  \edef\DayLabel{day\CurrentDay.\CurrentMonth.\CurrentYear}%
+  \hypertarget{\DayLabel}{}%
+  \edef\FieldLabel{\CurrentDay.\CurrentMonth.\CurrentYear}%
+
+  % Subsection for the day (empty to suppress numbering)
+  \subsection*{}
+
+  % Centered date and weekday using full names, including month name from \pgfcalendarmonthname
+\begin{minipage}{0.25\textwidth}
+    {\Large \textbf{\ \hyperlink{Overview}{Overview}}}
+\end{minipage}
+  \begin{minipage}{0.5\textwidth}
+      \begin{center}
+    {\Large \textbf{\pgfcalendarweekdayname{\WeekdayNumber}, \CurrentDay.\CurrentMonth.\CurrentYear}}%
+    \end{center}   
+  \end{minipage}
+  \begin{minipage}{0.225\textwidth}
+    \raggedleft {\Large \textbf{CW: \the\myWeekNumber}}%
+  \end{minipage}
+
+
+  % Months display with hyperlinks in one row, using the correct label and display name
+\vspace{-0.5cm}
+  \begin{center}
+    \renewcommand{\arraystretch}{1.2}%
+    \begin{tabularx}{1.02\textwidth}{*{12}{X}}%
+      \hyperlink{month01}{\pgfcalendarmonthshortname{1}} & \hyperlink{month02}{\pgfcalendarmonthshortname{2} } & \hyperlink{month03}{\pgfcalendarmonthshortname{3} } & \hyperlink{month04}{\pgfcalendarmonthshortname{4} } & \hyperlink{month05}{\pgfcalendarmonthshortname{5} } & \hyperlink{month06}{\pgfcalendarmonthshortname{6} } & \hyperlink{month07}{\pgfcalendarmonthshortname{7} } & \hyperlink{month08}{\pgfcalendarmonthshortname{8} } & \hyperlink{month09}{\pgfcalendarmonthshortname{9} } & \hyperlink{month10}{\pgfcalendarmonthshortname{10}\ } & \hyperlink{month11}{\pgfcalendarmonthshortname{11} } & \hyperlink{month12}{\pgfcalendarmonthshortname{12} } \\
+    \end{tabularx}%
+  \end{center}
+  % Main content area (you can add your content here)
+  \hspace{-0.75cm}
+ \begin{minipage}[t]{0.15\textwidth}
+    % Sidebar with linked days
+    \raggedright
+    \fontsize{9pt}{11pt}\selectfont
+    \begin{itemize}[label={}]
+      \setlength\itemsep{0cm}
+      \setlength{\parskip}{0cm}
+      % Loop over all days of the current month
+      \pgfcalendar{currentmonth}{\CurrentYear-\CurrentMonth-01}{\CurrentYear-\CurrentMonth-last}{%
+        \edef\ListDay{\pgfcalendarcurrentday}%
+        \edef\ListDate{\pgfcalendarcurrentday.\pgfcalendarcurrentmonth.\pgfcalendarcurrentyear}%
+        \edef\ListLabel{day\ListDate}%
+        % Check if ListDay is equal to CurrentDay
+        \ifnum\ListDay=\CurrentDay\relax
+          \item \hspace*{0.2cm}\textbf{\hyperlink{\ListLabel}{\ListDate}}%
+        \else
+          \item \hyperlink{\ListLabel}{\ListDate}%
+        \fi
+      }% End of \pgfcalendar loop
+    \end{itemize}
+
+  \end{minipage}
+  \begin{minipage}{0.85\textwidth}
+      
+  
+\begin{textblock*}{10cm}(0cm,-.1cm)
+
+\begin{Form}
+\TextField[bordercolor={black},backgroundcolor={},multiline,name=text_\FieldLabel,width=10cm,height=10cm,charsize=12pt]{\mbox{}}
+\end{Form}
+\end{textblock*}
+
+\begin{textblock*}{6cm}(10.5cm,-.1cm)
+\textbf{To-Do:}
+\vspace{0.2cm}
+\begin{Form}
+\TextField[bordercolor={black},backgroundcolor={},multiline,name=todo_\FieldLabel,width=5.8cm,height=4.5cm,charsize=12pt]{\mbox{}}
+\end{Form}
+\end{textblock*}
+
+\begin{textblock*}{4cm}(10.5cm,6cm)
+\textbf{Habits:}\\
+\begin{Form}
+\def\arraystretch{1.65}
+\begin{tabular}{ll}
+\CheckBox[bordercolor={black},backgroundcolor={},name=check1_\FieldLabel,charsize=12pt] & \\
+\CheckBox[bordercolor={black},backgroundcolor={},name=check2_\FieldLabel,charsize=12pt] & \\
+\CheckBox[bordercolor={black},backgroundcolor={},name=check3_\FieldLabel,charsize=12pt] & \\
+\CheckBox[bordercolor={black},backgroundcolor={},name=check4_\FieldLabel,charsize=12pt] & \\
+\CheckBox[bordercolor={black},backgroundcolor={},name=check5_\FieldLabel,charsize=12pt] & 
+\end{tabular}
+\end{Form}
+\end{textblock*}
+
+
+
+
+
+\begin{textblock*}{4.5cm}(10.5cm,6.4cm)
+\begin{Form}
+\def\arraystretch{1.65}
+\begin{tabular}{ll}
+\TextField[bordercolor={},backgroundcolor={},name=habit1,width=5.5cm,charsize=12pt] & \\
+\TextField[bordercolor={},backgroundcolor={},name=habit2,width=5.5cm,charsize=12pt] & \\
+\TextField[bordercolor={},backgroundcolor={},name=habit3,width=5.5cm,charsize=12pt] & \\
+\TextField[bordercolor={},backgroundcolor={},name=habit4,width=5.5cm,charsize=12pt] & \\
+\TextField[bordercolor={},backgroundcolor={},name=habit5,width=5.5cm,charsize=12pt] &
+\end{tabular}
+\end{Form}
+\end{textblock*}
+\end{minipage}
+\ifdate{Sunday}{\clearpage
+\label{sumCW\the\myWeekNumber}
+\subsection{Summary of Calendar Week\ \the\myWeekNumber\ \CurrentYear}
+}{}
+\ifdate{equals=\CurrentYear-\CurrentMonth-last}
+{\clearpage
+\label{summonth\CurrentMonth}
+\subsection{Summary of \pgfcalendarmonthname{\CurrentMonth}\ \CurrentYear}
+
+
+}{}
+}
+
+\end{document}
